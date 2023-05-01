@@ -1119,6 +1119,42 @@ changed: [k8s-node-2]
 changed: [k8s-node-1]
 
 TASK [Joining nodes to cluster] ************************************************
+fatal: [k8s-node-1]: FAILED! => changed=true
+  cmd: |-
+    set -o pipefail
+    kubeadm join 192.168.56.10:6443 --token nefvfc.k822oylv1ltpfs1j --discovery-token-ca-cert-hash sha256:b9511b0b3dbb789557d29eb74877dd6520f81b722e93bf6e0817007e580e5bc6
+  delta: '0:05:00.474732'
+  end: '2023-05-01 02:15:30.686283'
+  msg: non-zero return code
+  rc: 1
+  start: '2023-05-01 02:10:30.211551'
+  stderr: |-
+    error execution phase preflight: couldn't validate the identity of the API Server: Get "https://192.168.56.10:6443/api/v1/namespaces/kube-public/configmaps/cluster-info?timeout=10s": tls: failed to verify certificate: x509: certificate is valid for 10.96.0.1, 10.0.2.15, not 192.168.56.10
+    To see the stack trace of this error execute with --v=5 or higher
+  stderr_lines: <omitted>
+  stdout: '[preflight] Running pre-flight checks'
+  stdout_lines: <omitted>
+fatal: [k8s-node-2]: FAILED! => changed=true
+  cmd: |-
+    set -o pipefail
+    kubeadm join 192.168.56.10:6443 --token nefvfc.k822oylv1ltpfs1j --discovery-token-ca-cert-hash sha256:b9511b0b3dbb789557d29eb74877dd6520f81b722e93bf6e0817007e580e5bc6
+  delta: '0:05:39.340066'
+  end: '2023-05-01 02:16:09.556103'
+  msg: non-zero return code
+  rc: 1
+  start: '2023-05-01 02:10:30.216037'
+  stderr: |-
+    error execution phase preflight: couldn't validate the identity of the API Server: Get "https://192.168.56.10:6443/api/v1/namespaces/kube-public/configmaps/cluster-info?timeout=10s": tls: failed to verify certificate: x509: certificate is valid for 10.96.0.1, 10.0.2.15, not 192.168.56.10
+    To see the stack trace of this error execute with --v=5 or higher
+  stderr_lines: <omitted>
+  stdout: '[preflight] Running pre-flight checks'
+  stdout_lines: <omitted>
+
+PLAY RECAP *********************************************************************
+k8s-master                 : ok=32   changed=21   unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+k8s-node-1                 : ok=25   changed=14   unreachable=0    failed=1    skipped=0    rescued=0    ignored=0
+k8s-node-2                 : ok=20   changed=14   unreachable=0    failed=1    skipped=0    rescued=0    ignored=0
+localhost                  : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
 
 </details>
