@@ -15,6 +15,24 @@ Using the project and the automation it contains, a user should be able to:
 A Vagrantfile is provided to automate creating the virtual machines with
 Vagrant, and an Ansible playbook is provided to do everything else.
 
+## Issues
+
+* Stalls when `Joining nodes to the cluster` (Command just hangs)
+
+* Errors in `/var/log/syslog` on nodes:
+
+```txt
+r/lib/kubelet/config.yaml, error failed to read kubelet config file \"/var/lib/kubelet/config.yaml\", error: open /var/lib/kubelet/config.yaml: no such file or directory, path: /var/lib/kubelet/config.yaml"
+May  1 02:12:55 ubuntu-jammy systemd[1]: kubelet.service: Main process exited, code=exited, status=1/FAILURE
+May  1 02:12:55 ubuntu-jammy systemd[1]: kubelet.service: Failed with result 'exit-code'.
+May  1 02:13:05 ubuntu-jammy systemd[1]: kubelet.service: Scheduled restart job, restart counter is at 31.
+May  1 02:13:05 ubuntu-jammy systemd[1]: Stopped kubelet: The Kubernetes Node Agent.
+May  1 02:13:05 ubuntu-jammy systemd[1]: Started kubelet: The Kubernetes Node Agent.
+May  1 02:13:05 ubuntu-jammy kubelet[6717]: E0501 02:13:05.424037    6717 run.go:74] "command failed" err="failed to load kubelet config file, error: failed to load Kubelet config file /var/lib/kubelet/config.yaml, error failed to read kubelet config file \"/var/lib/kubelet/config.yaml\", error: open /var/lib/kubelet/config.yaml: no such file or directory, path: /var/lib/kubelet/config.yaml"
+May  1 02:13:05 ubuntu-jammy systemd[1]: kubelet.service: Main process exited, code=exited, status=1/FAILURE
+May  1 02:13:05 ubuntu-jammy systemd[1]: kubelet.service: Failed with result 'exit-code'.
+```
+
 ## Requirements
 
 - VirtualBox
