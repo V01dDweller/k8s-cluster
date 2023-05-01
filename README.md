@@ -10,7 +10,7 @@ Using the project and the automation it contains, a user should be able to:
 1. Install `kubeadmin` on the host
 1. Install Docker on each virtual machine
 1. Configure one virtual machine as the master
-1. Configure the remaining two virtual machine as the worker nodes
+1. Configure the remaining two virtual machines as worker nodes
 
 A Vagrantfile is provided to automate creating the virtual machines with
 Vagrant, and an Ansible playbook is provided to do everything else.
