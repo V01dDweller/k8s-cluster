@@ -32,8 +32,6 @@ Vagrant, and an Ansible playbook is provided to do everything else.
 Windows PowerShell
 Copyright (C) Microsoft Corporation. All rights reserved.
 
-Install the latest PowerShell for new features and improvements! https://aka.ms/PSWindows
-
 PS C:\Users\V01dDweller> cd .\Desktop\k8s-cluster\
 PS C:\Users\V01dDweller\Desktop\k8s-cluster>
 ```
