@@ -401,6 +401,17 @@
         creates: /etc/kubernetes/kubelet.conf
       register: node_status
 
+    - name: Installing Flannel for networking
+      ansible.builtin.shell: |
+        set -o pipefail
+        kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
+      args:
+        executable: /bin/bash
+      become: false
+      changed_when: false
+      ignore_errors: true
+      delegate_to: '{{ master_hostname }}'
+
     - name: Displaying node status
       ansible.builtin.debug:
         msg: '{{ node_status.stdout }}'
