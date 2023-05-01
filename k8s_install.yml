@@ -320,6 +320,7 @@
         - name: Displaying the join command
           ansible.builtin.debug:
             msg: '{{ kubeadm_join_command.stdout }}'
+          tags: never
 
         - name: Saving the tokens
           ansible.builtin.set_fact:
@@ -331,6 +332,7 @@
             msg: |
               Token: {{ token }}
               Discovery token cert hash: {{ cert_hash }}
+          tags: never
       become: false
       run_once: true
 
