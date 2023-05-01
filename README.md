@@ -23,6 +23,13 @@ Vagrant, and an Ansible playbook is provided to do everything else.
 
 ## Usage
 
+#### MacOS/Linux
+
+1. Open a terminal and clone the project
+1. CD into the project directory
+1. Issue a `vagrant up` to create the virtual machines
+1. Run the playbook, e.g. `ansible-playbook k8s_install.yml`
+
 #### Windows
 1. Clone this project to the Desktop
 
@@ -47,13 +54,6 @@ created in step 2. The `.vagrant` directory contains ssh keys for each virtual
 machine. Ansible defaults to ssh connections and will use these keys.
 
 1. Finally, run the playbook
-
-#### MacOS/Linux
-
-1. Open a terminal and clone the project
-1. CD into the project directory
-1. Issue a `vagrant up` to create the virtual machines
-1. Run the playbook, e.g. `ansible-playbook k8s_install.yml`
 
 ```sh
 ansible-playbook k8s_install.yml
