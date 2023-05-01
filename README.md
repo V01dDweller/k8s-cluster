@@ -78,7 +78,7 @@ ansible-playbook k8s_install.yml
 ```
 
 <details>
-<summary>Sample output:</summary>
+<summary>Sample output: Vagrant</summary>
 
 ```txt
 PS C:\Users\V01dDweller\Desktop\k8s-project> vagrant up
@@ -827,6 +827,301 @@ Bringing machine 'k8s-node-2' up with 'virtualbox' provider...
 ==> k8s-node-2: Configuring and enabling network interfaces...
 ==> k8s-node-2: Mounting shared folders...
     k8s-node-2: /vagrant => C:/Users/V01dDweller/Desktop/k8s-project
+```
+
+</details>
+
+<details>
+<summary>Sample output: Ansible</summary>
+
+```txt
+bash-5.1$ ansible-playbook k8s_install.yml
+
+PLAY [Install kubectl locally] *************************************************
+
+TASK [Retrieving kubectl latest stable version] ********************************
+ok: [localhost]
+
+TASK [Displaying kubectl latest stable version] ********************************
+ok: [localhost] =>
+  msg: Lastest kubectl version is v1.27.1
+
+TASK [Downloading /usr/local/bin/kubectl v1.27.1] ******************************
+ok: [localhost]
+
+PLAY [Installing Docker] *******************************************************
+
+TASK [docker_install : Gathering facts] ****************************************
+ok: [k8s-node-1]
+ok: [k8s-node-2]
+ok: [k8s-master]
+
+TASK [docker_install : Installing dependencies] ********************************
+ok: [k8s-master]
+ok: [k8s-node-1]
+ok: [k8s-node-2]
+
+TASK [docker_install : Adding GPG key for Docker apt repo] *********************
+changed: [k8s-node-1]
+changed: [k8s-master]
+changed: [k8s-node-2]
+
+TASK [docker_install : Adding Docker apt repo] *********************************
+changed: [k8s-node-1]
+changed: [k8s-master]
+changed: [k8s-node-2]
+
+TASK [docker_install : Updating apt cache] *************************************
+ok: [k8s-node-1]
+ok: [k8s-master]
+ok: [k8s-node-2]
+
+TASK [docker_install : Installing Docker CE] ***********************************
+changed: [k8s-node-1]
+changed: [k8s-master]
+changed: [k8s-node-2]
+
+TASK [docker_install : Adding vagrant to the docker group] *********************
+changed: [k8s-node-2]
+changed: [k8s-node-1]
+changed: [k8s-master]
+
+TASK [docker_install : Restarting Docker now] **********************************
+
+TASK [docker_install : Restarting Docker now] **********************************
+
+TASK [docker_install : Restarting Docker now] **********************************
+
+RUNNING HANDLER [docker_install : Restart Docker] ******************************
+changed: [k8s-node-1]
+changed: [k8s-master]
+changed: [k8s-node-2]
+
+TASK [Adding Kubernetes signing key] *******************************************
+changed: [k8s-node-1]
+changed: [k8s-node-2]
+changed: [k8s-master]
+
+TASK [Adding Kubernetes repository] ********************************************
+changed: [k8s-node-2]
+changed: [k8s-node-1]
+changed: [k8s-master]
+
+TASK [Setting kubernetes_packages fact] ****************************************
+ok: [k8s-master]
+ok: [k8s-node-1]
+ok: [k8s-node-2]
+
+TASK [Installing kubeadm kubelet and kubectl] **********************************
+changed: [k8s-node-1]
+changed: [k8s-master]
+changed: [k8s-node-2]
+
+TASK [Issuing apt-mark hold on kubeadm kubelet and kubectl] ********************
+changed: [k8s-node-1] => (item=Holding kubelet package)
+changed: [k8s-node-2] => (item=Holding kubelet package)
+changed: [k8s-master] => (item=Holding kubelet package)
+changed: [k8s-node-1] => (item=Holding kubeadm package)
+changed: [k8s-node-2] => (item=Holding kubeadm package)
+changed: [k8s-master] => (item=Holding kubeadm package)
+changed: [k8s-node-1] => (item=Holding kubectl package)
+changed: [k8s-node-2] => (item=Holding kubectl package)
+changed: [k8s-master] => (item=Holding kubectl package)
+
+TASK [Creating /etc/modules-load.d/containerd.conf] ****************************
+changed: [k8s-node-2]
+changed: [k8s-node-1]
+changed: [k8s-master]
+
+TASK [Creating /etc/sysctl.d/kubernetes.conf] **********************************
+changed: [k8s-master]
+changed: [k8s-node-1]
+changed: [k8s-node-2]
+
+RUNNING HANDLER [Issue modprobe overlay] ***************************************
+ok: [k8s-node-1]
+ok: [k8s-master]
+ok: [k8s-node-2]
+
+RUNNING HANDLER [Reload sysctl] ************************************************
+ok: [k8s-master]
+ok: [k8s-node-1]
+ok: [k8s-node-2]
+
+PLAY [Configure the master] ****************************************************
+
+TASK [Creating /etc/default/kubelet] *******************************************
+changed: [k8s-master]
+
+TASK [Creating /etc/docker/daemon.json] ****************************************
+changed: [k8s-master]
+
+TASK [Updating /etc/systemd/system/kubelet.service.d/10-kubeadm.conf] **********
+changed: [k8s-master]
+
+TASK [Updating /etc/containerd/config.toml] ************************************
+changed: [k8s-master]
+
+TASK [Flushing handlers now to restart containerd] *****************************
+
+RUNNING HANDLER [Restart kubelet] **********************************************
+changed: [k8s-master]
+
+RUNNING HANDLER [Restart docker] ***********************************************
+changed: [k8s-master]
+
+RUNNING HANDLER [Restart containerd] *******************************************
+changed: [k8s-master]
+
+TASK [Saving the master hostname from the inventory] ***************************
+ok: [k8s-master]
+
+TASK [Who's da master?] ********************************************************
+ok: [k8s-master] =>
+  msg: The master is k8s-master
+
+TASK [Initializing the cluster via kubeadmin] **********************************
+changed: [k8s-master]
+
+TASK [Displaying kubeadm init output] ******************************************
+ok: [k8s-master] =>
+  msg:
+  - '[init] Using Kubernetes version: v1.27.1'
+  - '[preflight] Running pre-flight checks'
+  - '[preflight] Pulling images required for setting up a Kubernetes cluster'
+  - '[preflight] This might take a minute or two, depending on the speed of your internet connection'
+  - '[preflight] You can also perform this action in beforehand using ''kubeadm config images pull'''
+  - '[certs] Using certificateDir folder "/etc/kubernetes/pki"'
+  - '[certs] Generating "ca" certificate and key'
+  - '[certs] Generating "apiserver" certificate and key'
+  - '[certs] apiserver serving cert is signed for DNS names [k8s-master kubernetes kubernetes.default kubernetes.default.svc kubernetes.default.svc.cluster.local] and IPs [10.96.0.1 10.0.2.15]'
+  - '[certs] Generating "apiserver-kubelet-client" certificate and key'
+  - '[certs] Generating "front-proxy-ca" certificate and key'
+  - '[certs] Generating "front-proxy-client" certificate and key'
+  - '[certs] Generating "etcd/ca" certificate and key'
+  - '[certs] Generating "etcd/server" certificate and key'
+  - '[certs] etcd/server serving cert is signed for DNS names [k8s-master localhost] and IPs [10.0.2.15 127.0.0.1 ::1]'
+  - '[certs] Generating "etcd/peer" certificate and key'
+  - '[certs] etcd/peer serving cert is signed for DNS names [k8s-master localhost] and IPs [10.0.2.15 127.0.0.1 ::1]'
+  - '[certs] Generating "etcd/healthcheck-client" certificate and key'
+  - '[certs] Generating "apiserver-etcd-client" certificate and key'
+  - '[certs] Generating "sa" key and public key'
+  - '[kubeconfig] Using kubeconfig folder "/etc/kubernetes"'
+  - '[kubeconfig] Writing "admin.conf" kubeconfig file'
+  - '[kubeconfig] Writing "kubelet.conf" kubeconfig file'
+  - '[kubeconfig] Writing "controller-manager.conf" kubeconfig file'
+  - '[kubeconfig] Writing "scheduler.conf" kubeconfig file'
+  - '[kubelet-start] Writing kubelet environment file with flags to file "/var/lib/kubelet/kubeadm-flags.env"'
+  - '[kubelet-start] Writing kubelet configuration to file "/var/lib/kubelet/config.yaml"'
+  - '[kubelet-start] Starting the kubelet'
+  - '[control-plane] Using manifest folder "/etc/kubernetes/manifests"'
+  - '[control-plane] Creating static Pod manifest for "kube-apiserver"'
+  - '[control-plane] Creating static Pod manifest for "kube-controller-manager"'
+  - '[control-plane] Creating static Pod manifest for "kube-scheduler"'
+  - '[etcd] Creating static Pod manifest for local etcd in "/etc/kubernetes/manifests"'
+  - '[wait-control-plane] Waiting for the kubelet to boot up the control plane as static Pods from directory "/etc/kubernetes/manifests". This can take up to 4m0s'
+  - '[apiclient] All control plane components are healthy after 13.003371 seconds'
+  - '[upload-config] Storing the configuration used in ConfigMap "kubeadm-config" in the "kube-system" Namespace'
+  - '[kubelet] Creating a ConfigMap "kubelet-config" in namespace kube-system with the configuration for the kubelets in the cluster'
+  - '[upload-certs] Skipping phase. Please see --upload-certs'
+  - '[mark-control-plane] Marking the node k8s-master as control-plane by adding the labels: [node-role.kubernetes.io/control-plane node.kubernetes.io/exclude-from-external-load-balancers]'
+  - '[mark-control-plane] Marking the node k8s-master as control-plane by adding the taints [node-role.kubernetes.io/control-plane:NoSchedule]'
+  - '[bootstrap-token] Using token: uxz2qw.xp9qsaqhz1lwkaw8'
+  - '[bootstrap-token] Configuring bootstrap tokens, cluster-info ConfigMap, RBAC Roles'
+  - '[bootstrap-token] Configured RBAC rules to allow Node Bootstrap tokens to get nodes'
+  - '[bootstrap-token] Configured RBAC rules to allow Node Bootstrap tokens to post CSRs in order for nodes to get long term certificate credentials'
+  - '[bootstrap-token] Configured RBAC rules to allow the csrapprover controller automatically approve CSRs from a Node Bootstrap Token'
+  - '[bootstrap-token] Configured RBAC rules to allow certificate rotation for all node client certificates in the cluster'
+  - '[bootstrap-token] Creating the "cluster-info" ConfigMap in the "kube-public" namespace'
+  - '[kubelet-finalize] Updating "/etc/kubernetes/kubelet.conf" to point to a rotatable kubelet client certificate and key'
+  - '[addons] Applied essential addon: CoreDNS'
+  - '[addons] Applied essential addon: kube-proxy'
+  - ''
+  - Your Kubernetes control-plane has initialized successfully!
+  - ''
+  - 'To start using your cluster, you need to run the following as a regular user:'
+  - ''
+  - '  mkdir -p $HOME/.kube'
+  - '  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config'
+  - '  sudo chown $(id -u):$(id -g) $HOME/.kube/config'
+  - ''
+  - 'Alternatively, if you are the root user, you can run:'
+  - ''
+  - '  export KUBECONFIG=/etc/kubernetes/admin.conf'
+  - ''
+  - You should now deploy a pod network to the cluster.
+  - 'Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:'
+  - '  https://kubernetes.io/docs/concepts/cluster-administration/addons/'
+  - ''
+  - You can now join any number of control-plane nodes by copying certificate authorities
+  - 'and service account keys on each node and then running the following as root:'
+  - ''
+  - '  kubeadm join k8s-master:6443 --token uxz2qw.xp9qsaqhz1lwkaw8 \'
+  - "\t--discovery-token-ca-cert-hash sha256:b9511b0b3dbb789557d29eb74877dd6520f81b722e93bf6e0817007e580e5bc6 \\"
+  - "\t--control-plane "
+  - ''
+  - 'Then you can join any number of worker nodes by running the following on each as root:'
+  - ''
+  - kubeadm join k8s-master:6443 --token uxz2qw.xp9qsaqhz1lwkaw8 \
+  - "\t--discovery-token-ca-cert-hash sha256:b9511b0b3dbb789557d29eb74877dd6520f81b722e93bf6e0817007e580e5bc6 "
+
+TASK [Creating $HOME/.kube] ****************************************************
+changed: [k8s-master]
+
+TASK [Creating $HOME/.kube admin.conf] *****************************************
+changed: [k8s-master]
+
+TASK [Getting cluster status] **************************************************
+ok: [k8s-master]
+
+TASK [Displaying cluter info] **************************************************
+ok: [k8s-master] =>
+  msg: |-
+    [0;32mKubernetes control plane[0m is running at [0;33mhttps://k8s-master:6443[0m
+    [0;32mCoreDNS[0m is running at [0;33mhttps://k8s-master:6443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy[0m
+
+    To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
+    NAME         STATUS     ROLES           AGE   VERSION
+    k8s-master   NotReady   control-plane   8s    v1.27.1
+
+PLAY [Configure the nodes] *****************************************************
+
+TASK [Retrieving master name and ip from inventory] ****************************
+ok: [k8s-node-1 -> localhost]
+
+TASK [Retrieving the join command] *********************************************
+ok: [k8s-node-1 -> k8s-master(192.168.56.10)]
+
+TASK [Displaying the join command] *********************************************
+ok: [k8s-node-1] =>
+  msg: 'kubeadm join k8s-master:6443 --token nefvfc.k822oylv1ltpfs1j --discovery-token-ca-cert-hash sha256:b9511b0b3dbb789557d29eb74877dd6520f81b722e93bf6e0817007e580e5bc6 '
+
+TASK [Saving the tokens] *******************************************************
+ok: [k8s-node-1]
+
+TASK [Displaying the tokens] ***************************************************
+ok: [k8s-node-1] =>
+  msg: |-
+    Token: nefvfc.k822oylv1ltpfs1j
+    Discovery token cert hash: sha256:b9511b0b3dbb789557d29eb74877dd6520f81b722e93bf6e0817007e580e5bc6
+
+TASK [Disabling apparmor service] **********************************************
+changed: [k8s-node-1]
+changed: [k8s-node-2]
+
+TASK [Updating /etc/containerd/config.toml] ************************************
+changed: [k8s-node-1]
+changed: [k8s-node-2]
+
+TASK [Flushing handlers now to restart containerd] *****************************
+
+TASK [Flushing handlers now to restart containerd] *****************************
+
+RUNNING HANDLER [Restart containerd] *******************************************
+changed: [k8s-node-2]
+changed: [k8s-node-1]
+
+TASK [Joining nodes to cluster] ************************************************
 ```
 
 </details>
