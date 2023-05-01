@@ -15,6 +15,29 @@ Using the project and the automation it contains, a user should be able to:
 A Vagrantfile is provided to automate creating the virtual machines with
 Vagrant, and an Ansible playbook is provided to do everything else.
 
+### Files
+
+```txt
+├── README.md                  # You are here
+├── Vagrantfile                # Creates three virtual machines
+├── ansible.cfg
+├── bootstrap.sh               # Not used yet
+├── hosts
+│   └── vagrant
+│       ├── group_vars
+│       │   └── all.yml
+│       └── hosts              # Ansible inventory
+├── k8s_install.yml            # Playbook
+├── roles
+│   └── docker_install
+│       ├── handlers
+│       │   └── main.yml
+│       ├── meta
+│       └── tasks
+│           └── main.yml
+└── vagrant_update.sh          # Copies .vagrant dir to WSL2 (Windows only)
+```
+
 ### References
 
 * [How to Install Kubernetes Cluster on Ubuntu 22.04](https://www.linuxtechi.com/install-kubernetes-on-ubuntu-22-04/)
