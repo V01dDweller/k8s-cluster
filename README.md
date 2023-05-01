@@ -15,6 +15,11 @@ Using the project and the automation it contains, a user should be able to:
 A Vagrantfile is provided to automate creating the virtual machines with
 Vagrant, and an Ansible playbook is provided to do everything else.
 
+### References
+
+* [How to Install Kubernetes Cluster on Ubuntu 22.04](https://www.linuxtechi.com/install-kubernetes-on-ubuntu-22-04/)
+* [How to Install Kubernetes on Ubuntu 20.04](https://phoenixnap.com/kb/install-kubernetes-on-ubuntu)
+
 ## Issues
 
 * Stalls when `Joining nodes to the cluster` (Command just hangs)
