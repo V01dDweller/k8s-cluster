@@ -28,7 +28,7 @@ Vagrant, and an Ansible playbook is provided to do everything else.
 
 1. Open a PowerShell and CD to the project directory, e.g.:
 
-```cmd
+```txt
 Windows PowerShell
 Copyright (C) Microsoft Corporation. All rights reserved.
 
