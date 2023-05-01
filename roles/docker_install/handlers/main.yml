@@ -1,0 +1,9 @@
+# file: roles/docker_install/handlers/main.yml
+---
+- name: Restart Docker
+  ansible.builtin.systemd:
+    name: docker
+    state: restarted
+    enabled: true
+    daemon_reload: true
+...

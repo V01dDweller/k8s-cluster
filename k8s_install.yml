@@ -1,0 +1,411 @@
+# file: k8s_install.yml
+---
+- name: Install kubectl locally
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Retrieving kubectl latest stable version
+      ansible.builtin.uri:
+        url: https://dl.k8s.io/release/stable.txt
+        method: GET
+        return_content: true
+      register: kubectl_version
+
+    - name: Displaying kubectl latest stable version
+      ansible.builtin.debug:
+        msg: Lastest kubectl version is {{ kubectl_version.content }}
+
+    - name: Downloading /usr/local/bin/kubectl {{ kubectl_version.content }}
+      ansible.builtin.get_url:
+        url: https://dl.k8s.io/release/{{ kubectl_version.content }}/bin/linux/amd64/kubectl
+        dest: /usr/local/bin/kubectl
+        mode: '0755'
+        owner: root
+        group: root
+
+- name: Installing Docker
+  hosts: all
+  become: true
+  gather_facts: false
+  roles:
+    - role: docker_install
+
+  post_tasks:
+    - name: Adding Kubernetes signing key
+      ansible.builtin.apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        keyring: /usr/share/keyrings/kubernetes.gpg
+        state: present
+
+    - name: Adding Kubernetes repository
+      ansible.builtin.apt_repository:
+        repo: deb [arch=amd64 signed-by=/usr/share/keyrings/kubernetes.gpg] http://apt.kubernetes.io/ kubernetes-xenial main
+        state: present
+        filename: kubernetes.list
+
+    - name: Setting kubernetes_packages fact
+      ansible.builtin.set_fact:
+        kubernetes_packages:
+          - kubelet
+          - kubeadm
+          - kubectl
+
+    - name: Installing kubeadm kubelet and kubectl
+      ansible.builtin.apt:
+        name: '{{ kubernetes_packages }}'
+        state: present
+        update_cache: true
+
+    - name: Issuing apt-mark hold on kubeadm kubelet and kubectl
+      ansible.builtin.dpkg_selections:
+        name: '{{ package }}'
+        selection: hold
+      loop: '{{ kubernetes_packages }}'
+      loop_control:
+        loop_var: package
+        label: Holding {{ package }} package
+
+    - name: Creating /etc/modules-load.d/containerd.conf
+      ansible.builtin.copy:
+        content: |
+          overlay
+          br_netfilter
+        dest: /etc/modules-load.d/containerd.conf
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Issue modprobe overlay
+
+    - name: Creating /etc/sysctl.d/kubernetes.conf
+      ansible.builtin.copy:
+        content: |
+          net.bridge.bridge-nf-call-ip6tables = 1
+          net.bridge.bridge-nf-call-iptables = 1
+          net.ipv4.ip_forward = 1
+        dest: /etc/sysctl.d/kubernetes.conf
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Reload sysctl
+
+  handlers:
+    - name: Issue modprobe overlay
+      ansible.builtin.command: modprobe overlay
+      changed_when: false
+
+    - name: Reload sysctl
+      ansible.builtin.command: sysctl --system
+      changed_when: false
+
+- name: Configure the master
+  hosts: k8s-master
+  become: true
+  gather_facts: false
+  tags: master
+  tasks:
+    - name: Creating /etc/default/kubelet
+      ansible.builtin.copy:
+        content: |
+          KUBELET_EXTRA_ARGS="--cgroup-driver=cgroupfs"
+        dest: /etc/default/kubelet
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Restart kubelet
+
+    - name: Creating /etc/docker/daemon.json
+      ansible.builtin.copy:
+        content: |
+          {
+            "exec-opts": ["native.cgroupdriver=systemd"],
+            "log-driver": "json-file",
+            "log-opts": {
+              "max-size": "100m"
+            },
+            "storage-driver": "overlay2",
+            "storage-opts": [
+              "overlay2.override_kernel_check=true"
+            ]
+          }
+        dest: /etc/docker/daemon.json
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Restart docker
+
+    - name: Updating /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+      ansible.builtin.copy:
+        content: |
+          # Note: This dropin only works with kubeadm and kubelet v1.11+
+          [Service]
+          Environment="KUBELET_KUBECONFIG_ARGS=--bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kubelet.conf"
+          Environment="KUBELET_CONFIG_ARGS=--config=/var/lib/kubelet/config.yaml"
+          Environment="KUBELET_EXTRA_ARGS=--fail-swap-on=false"
+          # This is a file that "kubeadm init" and "kubeadm join" generates at runtime, populating the KUBELET_KUBEADM_ARGS variable dynamically
+          EnvironmentFile=-/var/lib/kubelet/kubeadm-flags.env
+          # This is a file that the user can use for overrides of the kubelet args as a last resort. Preferably, the user should use
+          # the .NodeRegistration.KubeletExtraArgs object in the configuration files instead. KUBELET_EXTRA_ARGS should be sourced from this file.
+          EnvironmentFile=-/etc/default/kubelet
+          ExecStart=
+          ExecStart=/usr/bin/kubelet $KUBELET_KUBECONFIG_ARGS $KUBELET_CONFIG_ARGS $KUBELET_KUBEADM_ARGS $KUBELET_EXTRA_ARGS
+        dest: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Restart kubelet
+
+    - name: Updating /etc/containerd/config.toml
+      # This task solves the issue with kubeadm init command failing as follows:
+      # (Reference: https://github.com/containerd/containerd/issues/8139)
+      #
+      #     sudo kubeadm init --control-plane-endpoint=k8s-master
+      #     [init] Using Kubernetes version: v1.27.1
+      #     [preflight] Running pre-flight checks
+      #     error execution phase preflight: [preflight] Some fatal errors occurred:
+      #             [ERROR CRI]: container runtime is not running: output:
+      #             time="2023-04-30T19:53:03Z" level=fatal msg="validate
+      #             service connection: CRI v1 runtime API is not implemented
+      #             for endpoint
+      #             \"unix:///var/run/containerd/containerd.sock\": rpc error:
+      #             code = Unimplemented desc = unknown service
+      #             runtime.v1.RuntimeService" , error: exit status 1
+      #             [preflight] If you know what you are doing, you can make a
+      #             check non-fatal with `--ignore-preflight-errors=...` To
+      #             see the stack trace of this error execute with --v=5 or
+      #             higher
+      ansible.builtin.copy:
+        content: |
+          #   Copyright 2018-2022 Docker Inc.
+
+          #   Licensed under the Apache License, Version 2.0 (the "License");
+          #   you may not use this file except in compliance with the License.
+          #   You may obtain a copy of the License at
+
+          #       http://www.apache.org/licenses/LICENSE-2.0
+
+          #   Unless required by applicable law or agreed to in writing, software
+          #   distributed under the License is distributed on an "AS IS" BASIS,
+          #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+          #   See the License for the specific language governing permissions and
+          #   limitations under the License.
+
+          enabled_plugins = ["cri"]
+          [plugins."io.containerd.grpc.v1.cri".containerd]
+            endpoint = "unix:///var/run/containerd/containerd.sock"
+
+
+          #root = "/var/lib/containerd"
+          #state = "/run/containerd"
+          #subreaper = true
+          #oom_score = 0
+
+          #[grpc]
+          #  address = "/run/containerd/containerd.sock"
+          #  uid = 0
+          #  gid = 0
+
+          #[debug]
+          #  address = "/run/containerd/debug.sock"
+          #  uid = 0
+          #  gid = 0
+          #  level = "info"
+        dest: /etc/containerd/config.toml
+        owner: root
+        group: root
+        mode: '0644'
+        backup: true
+      notify: Restart containerd
+
+    - name: Flushing handlers now to restart containerd
+      ansible.builtin.meta: flush_handlers
+
+    - name: Saving the master hostname from the inventory
+      ansible.builtin.set_fact:
+        master_hostname: "{{ hostvars[groups['master'][0]].inventory_hostname }}"
+
+    - name: Who's da master?
+      ansible.builtin.debug:
+        msg: The master is {{ master_hostname }}
+
+    - name: Initializing the cluster via kubeadmin
+      ansible.builtin.shell: |
+        set -o pipefail
+        kubeadm init --control-plane-endpoint={{ master_hostname }}
+      args:
+        executable: /bin/bash
+        creates: /etc/kubernetes/admin.conf
+      register: kubeadm_init
+
+    - name: Displaying kubeadm init output
+      ansible.builtin.debug:
+        msg: '{{ kubeadm_init.stdout_lines }}'
+
+    - name: Creating $HOME/.kube
+      ansible.builtin.file:
+        path: /home/{{ ansible_user }}/.kube
+        state: directory
+        owner: '{{ ansible_user }}'
+        group: '{{ ansible_user }}'
+        mode: '0755'
+
+    - name: Creating $HOME/.kube admin.conf
+      ansible.builtin.copy:
+        src: /etc/kubernetes/admin.conf
+        remote_src: true
+        dest: /home/{{ ansible_user }}/.kube/config
+        owner: '{{ ansible_user }}'
+        group: '{{ ansible_user }}'
+        mode: '0644'
+
+    - name: Getting cluster status
+      ansible.builtin.shell: |
+        set -o pipefail
+        kubectl cluster-info
+        kubectl get nodes
+      args:
+        executable: /bin/bash
+      become: false
+      register: cluster_info
+      changed_when: false
+      ignore_errors: true
+
+    - name: Displaying cluter info
+      ansible.builtin.debug:
+        msg: '{{ cluster_info.stdout }}'
+
+  handlers:
+    - name: Restart kubelet
+      ansible.builtin.service:
+        name: kubelet
+        state: restarted
+        daemon_reload: true
+
+    - name: Restart docker
+      ansible.builtin.service:
+        name: docker
+        state: restarted
+
+    - name: Restart containerd
+      ansible.builtin.service:
+        name: containerd
+        state: restarted
+        daemon_reload: true
+
+- name: Configure the nodes
+  hosts: nodes
+  become: true
+  gather_facts: false
+  tags: nodes
+  tasks:
+    - name: Preparing to join nodes to cluster
+      block:
+        - name: Retrieving master name and ip from inventory
+          ansible.builtin.set_fact:
+            master_hostname: "{{ hostvars[groups['master'][0]].inventory_hostname }}"
+            master_ip: "{{ hostvars[groups['master'][0]].ansible_host }}"
+          delegate_to: localhost
+
+        - name: Retrieving the join command
+          ansible.builtin.shell: |
+            set -o pipefail
+            kubeadm token create --print-join-command
+          args:
+            executable: /bin/bash
+          delegate_to: '{{ master_hostname }}'
+          register: kubeadm_join_command
+          changed_when: false
+
+        - name: Displaying the join command
+          ansible.builtin.debug:
+            msg: '{{ kubeadm_join_command.stdout }}'
+
+        - name: Saving the tokens
+          ansible.builtin.set_fact:
+            token: '{{ kubeadm_join_command.stdout.split(" ")[4] }}'
+            cert_hash: '{{ kubeadm_join_command.stdout.split(" ")[6] }}'
+
+        - name: Displaying the tokens
+          ansible.builtin.debug:
+            msg: |
+              Token: {{ token }}
+              Discovery token cert hash: {{ cert_hash }}
+      become: false
+      run_once: true
+
+    - name: Disabling apparmor service
+      ansible.builtin.service:
+        name: apparmor
+        state: stopped
+        enabled: false
+        daemon_reload: true
+
+    - name: Updating /etc/containerd/config.toml
+      ansible.builtin.copy:
+        content: |
+          #   Copyright 2018-2022 Docker Inc.
+
+          #   Licensed under the Apache License, Version 2.0 (the "License");
+          #   you may not use this file except in compliance with the License.
+          #   You may obtain a copy of the License at
+
+          #       http://www.apache.org/licenses/LICENSE-2.0
+
+          #   Unless required by applicable law or agreed to in writing, software
+          #   distributed under the License is distributed on an "AS IS" BASIS,
+          #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+          #   See the License for the specific language governing permissions and
+          #   limitations under the License.
+
+          enabled_plugins = ["cri"]
+          [plugins."io.containerd.grpc.v1.cri".containerd]
+            endpoint = "unix:///var/run/containerd/containerd.sock"
+
+
+          #root = "/var/lib/containerd"
+          #state = "/run/containerd"
+          #subreaper = true
+          #oom_score = 0
+
+          #[grpc]
+          #  address = "/run/containerd/containerd.sock"
+          #  uid = 0
+          #  gid = 0
+
+          #[debug]
+          #  address = "/run/containerd/debug.sock"
+          #  uid = 0
+          #  gid = 0
+          #  level = "info"
+        dest: /etc/containerd/config.toml
+        owner: root
+        group: root
+        mode: '0644'
+        backup: true
+      notify: Restart containerd
+
+    - name: Flushing handlers now to restart containerd
+      ansible.builtin.meta: flush_handlers
+
+    - name: Joining nodes to cluster
+      ansible.builtin.shell: |
+        set -o pipefail
+        kubeadm join {{ master_ip }}:6443 --token {{ token }} --discovery-token-ca-cert-hash {{ cert_hash }}
+      args:
+        executable: /bin/bash
+        creates: /etc/kubernetes/kubelet.conf
+      register: node_status
+
+    - name: Displaying node status
+      ansible.builtin.debug:
+        msg: '{{ node_status.stdout }}'
+
+  handlers:
+    - name: Restart containerd
+      ansible.builtin.service:
+        name: containerd
+        state: restarted
+        daemon_reload: true
+...
+# vim: ft=ansible:syntax=yaml.ansible:number:nowrap
