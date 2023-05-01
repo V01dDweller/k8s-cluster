@@ -223,7 +223,7 @@
 
     - name: Saving the master hostname from the inventory
       ansible.builtin.set_fact:
-        master_hostname: "{{ hostvars[groups['master'][0]].inventory_hostname }}"
+        master_hostname: "{{ hostvars[groups['master'][0]].ansible_host }}"
 
     - name: Who's da master?
       ansible.builtin.debug:
@@ -232,7 +232,9 @@
     - name: Initializing the cluster via kubeadmin
       ansible.builtin.shell: |
         set -o pipefail
-        kubeadm init --control-plane-endpoint={{ master_hostname }}
+        kubeadm init \
+        --control-plane-endpoint={{ master_hostname }} \
+        --apiserver-advertise-address={{ master_hostname }} \
       args:
         executable: /bin/bash
         creates: /etc/kubernetes/admin.conf
