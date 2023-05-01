@@ -50,7 +50,7 @@ PS C:\Users\V01dDweller\Desktop\k8s-cluster>
 1. CD to the project directory
 
 1. Run the `./vagrant_update.sh` script to copy the `.vagrant` directory
-created in step 2. The `.vagrant` directory contains ssh keys for each virtual
+created by step 1. The `.vagrant` directory contains ssh keys for each virtual
 machine. Ansible defaults to ssh connections and will use these keys.
 
 1. Finally, run the playbook
