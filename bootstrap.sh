@@ -7,5 +7,6 @@
 
 set -Eeuo pipefail
 apt update
+apt install -y build-essential linux-headers-$(uname -r) libxt6 libxmu6
 # apt -y upgrade
 # apt -y autoremove
