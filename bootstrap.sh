@@ -7,5 +7,5 @@
 
 set -Eeuo pipefail
 apt update
-apt -y upgrade
-apt -y autoremove
+# apt -y upgrade
+# apt -y autoremove
