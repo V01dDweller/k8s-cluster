@@ -342,8 +342,6 @@
               Token: {{ token }}
               Discovery token cert hash: {{ cert_hash }}
           tags: never
-      become: false
-      run_once: true
 
     - name: Disabling apparmor service
       ansible.builtin.service:
