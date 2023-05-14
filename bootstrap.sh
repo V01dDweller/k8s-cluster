@@ -8,5 +8,10 @@
 set -Eeuo pipefail
 apt update
 apt install -y build-essential linux-headers-$(uname -r) libxt6 libxmu6
+#mount /dev/cdrom /media
+#sh /media/VBoxLinuxAdditions.run
+#umount /media
+#eject
+
 # apt -y upgrade
 # apt -y autoremove
