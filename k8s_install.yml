@@ -33,6 +33,11 @@
     - role: docker_install
 
   post_tasks:
+    - name: Setting time zone Americas/New_York
+      community.general.timezone:
+        name: America/New_York
+      tags: timezone
+
     - name: Adding Kubernetes signing key
       ansible.builtin.apt_key:
         url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
