@@ -415,6 +415,7 @@
       become: false
       changed_when: false
       ignore_errors: true
+      run_once: true
       delegate_to: '{{ master_hostname }}'
 
     - name: Displaying node status
