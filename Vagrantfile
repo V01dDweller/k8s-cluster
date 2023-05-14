@@ -4,7 +4,7 @@ NODE_COUNT=2
 Vagrant.configure("2") do |config|
   config.vm.define "k8s-master" do |subconfig|
     subconfig.vm.box = BOX_IMAGE
-    # subconfig.vbguest.auto_update = false
+    subconfig.vbguest.auto_update = false
     subconfig.vm.hostname = "k8s-master"
     subconfig.vm.network "private_network", ip: "192.168.56.10"
   end
@@ -12,7 +12,7 @@ Vagrant.configure("2") do |config|
   (1..NODE_COUNT).each do |i|
     config.vm.define "k8s-node-#{i}" do |subconfig|
       subconfig.vm.box = BOX_IMAGE
-      # subconfig.vbguest.auto_update = false
+      subconfig.vbguest.auto_update = false
       subconfig.vm.hostname = "k8s-node-#{i}"
       subconfig.vm.network "private_network", ip: "192.168.56.#{i + 10}"
     end
