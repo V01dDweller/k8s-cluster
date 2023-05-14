@@ -307,6 +307,8 @@
   tags: nodes
   tasks:
     - name: Preparing to join nodes to cluster
+      run_once: true
+      become: false
       block:
         - name: Retrieving master name and ip from inventory
           ansible.builtin.set_fact:
