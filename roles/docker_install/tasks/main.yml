@@ -44,6 +44,26 @@
     append: true
   notify: Restart Docker
 
+- name: Creating /etc/docker/daemon.json
+  ansible.builtin.copy:
+    content: |
+      {
+        "exec-opts": ["native.cgroupdriver=systemd"],
+        "log-driver": "json-file",
+        "log-opts": {
+          "max-size": "100m"
+        },
+        "storage-driver": "overlay2",
+        "storage-opts": [
+          "overlay2.override_kernel_check=true"
+        ]
+      }
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart docker
+
 - name: Restarting Docker now
   ansible.builtin.meta: flush_handlers
 ...
