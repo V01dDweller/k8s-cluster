@@ -246,6 +246,7 @@
       ansible.builtin.shell: |
         set -o pipefail
         kubeadm init \
+        --pod-network-cidr=10.244.0.0/16 \
         --control-plane-endpoint={{ master_hostname }} \
         --apiserver-advertise-address={{ master_hostname }} \
       args:
