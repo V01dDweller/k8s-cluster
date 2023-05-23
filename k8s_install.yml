@@ -256,7 +256,7 @@
 
     - name: Displaying kubeadm init output
       ansible.builtin.debug:
-        msg: '{{ kubeadm_init.stdout_lines }}'
+        msg: '{{ kubeadm_init.stdout }}'
 
     - name: Creating $HOME/.kube
       ansible.builtin.file:
