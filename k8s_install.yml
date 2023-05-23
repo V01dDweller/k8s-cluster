@@ -31,6 +31,9 @@
   gather_facts: false
   roles:
     - role: docker_install
+      tags:
+        - docker
+        - packages
 
   post_tasks:
     - name: Setting time zone Americas/New_York
@@ -43,12 +46,14 @@
         url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
         keyring: /usr/share/keyrings/kubernetes.gpg
         state: present
+      tags: packages
 
     - name: Adding Kubernetes repository
       ansible.builtin.apt_repository:
         repo: deb [arch=amd64 signed-by=/usr/share/keyrings/kubernetes.gpg] http://apt.kubernetes.io/ kubernetes-xenial main
         state: present
         filename: kubernetes.list
+      tags: packages
 
     - name: Setting kubernetes_packages fact
       ansible.builtin.set_fact:
@@ -56,12 +61,14 @@
           - kubelet
           - kubeadm
           - kubectl
+      tags: packages
 
     - name: Installing kubeadm kubelet and kubectl
       ansible.builtin.apt:
         name: '{{ kubernetes_packages }}'
         state: present
         update_cache: true
+      tags: packages
 
     - name: Issuing apt-mark hold on kubeadm kubelet and kubectl
       ansible.builtin.dpkg_selections:
@@ -71,6 +78,7 @@
       loop_control:
         loop_var: package
         label: Holding {{ package }} package
+      tags: packages
 
     - name: Creating /etc/modules-load.d/containerd.conf
       ansible.builtin.copy:
