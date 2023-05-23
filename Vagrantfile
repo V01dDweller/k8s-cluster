@@ -21,7 +21,7 @@ Vagrant.configure("2") do |config|
   end
   config.vm.provision "shell", path: "bootstrap.sh"
   config.vm.provider "virtualbox" do |vb|
-    vb.gui = true
+    vb.gui = false
     vb.memory = "2048"
     vb.cpus = 2
     vb.customize ["modifyvm", :id, "--vram", "33"]
