@@ -1,6 +1,7 @@
 #!/bin/env bash
 set -Eeuxo pipefail
 read -p "Enter your Windows username: " WINDOWS_USERNAME
+rm -rf .vagrant
 WINDOWS_PATH="/mnt/c/Users/$WINDOWS_USERNAME/Desktop/k8s-project/.vagrant"
 echo "Copying .vagrant directory from Windows to Linux..."
 cp -rv "$WINDOWS_PATH" ./
