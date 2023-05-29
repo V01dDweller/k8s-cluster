@@ -18,24 +18,54 @@ Vagrant, and an Ansible playbook is provided to do everything else.
 ### Files
 
 ```txt
-├── README.md                  # You are here
-├── Vagrantfile                # Creates three virtual machines
+├── README.md               # You are here
+├── Vagrantfile
 ├── ansible.cfg
-├── bootstrap.sh               # Not used yet
+├── bootstrap.sh
 ├── hosts
+│   ├── hosts.j2
 │   └── vagrant
 │       ├── group_vars
 │       │   └── all.yml
-│       └── hosts              # Ansible inventory
-├── k8s_install.yml            # Playbook
+│       └── hosts
+├── hosts_render.yml
+├── k8s_install.yml
 ├── roles
-│   └── docker_install
+│   ├── containerd_install
+│   │   ├── README.md
+│   │   ├── handlers
+│   │   │   └── main.yml
+│   │   ├── meta
+│   │   │   └── main.yml
+│   │   └── tasks
+│   │       └── main.yml
+│   ├── docker_install
+│   │   ├── files
+│   │   │   └── daemon.json
+│   │   ├── handlers
+│   │   │   └── main.yml
+│   │   ├── meta
+│   │   └── tasks
+│   │       ├── main.yml
+│   │       └── ubuntu22.yml
+│   ├── hosts_update
+│   │   ├── meta
+│   │   ├── tasks
+│   │   │   └── main.yml
+│   │   └── templates
+│   │       └── hosts.j2
+│   └── ipv6_disable
+│       ├── files
+│       │   └── grub
 │       ├── handlers
 │       │   └── main.yml
 │       ├── meta
+│       │   └── main.yml
 │       └── tasks
-│           └── main.yml
-└── vagrant_update.sh          # Copies .vagrant dir to WSL2 (Windows only)
+│           ├── main.yml
+│           └── ubuntu22.yml
+├── test_hosts
+└── vagrant_update.sh
 ```
 
 ### References
