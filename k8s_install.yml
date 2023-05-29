@@ -30,6 +30,13 @@
   become: true
   gather_facts: false
   roles:
+    - role: hosts_update
+      tags:
+        - hosts
+
+    - role: ipv6_disable
+      tags:
+        - ipv6
 
     - role: containerd_install
       tags:
