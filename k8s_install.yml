@@ -25,7 +25,7 @@
         owner: root
         group: root
 
-- name: Installing Docker
+- name: Installing Containerd, Docker and Kubernetes tools
   hosts: all
   become: true
   gather_facts: false
