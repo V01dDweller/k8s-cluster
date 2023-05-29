@@ -15,6 +15,27 @@ Using the project and the automation it contains, a user should be able to:
 A Vagrantfile is provided to automate creating the virtual machines with
 Vagrant, and an Ansible playbook is provided to do everything else.
 
+### Issues
+
+Flannel and proxy pods keep restarting:
+
+```
+vagrant@k8s-master:~$ kubectl get pods -A
+NAMESPACE      NAME                                 READY   STATUS             RESTARTS        AGE
+kube-flannel   kube-flannel-ds-4qvh6                1/1     Running            0               18m
+kube-flannel   kube-flannel-ds-6v6hc                0/1     CrashLoopBackOff   6 (116s ago)    18m
+kube-flannel   kube-flannel-ds-p6dgm                1/1     Running            6 (5m56s ago)   18m
+kube-system    coredns-5d78c9869d-g6cgv             1/1     Running            0               18m
+kube-system    coredns-5d78c9869d-kxmcp             1/1     Running            0               18m
+kube-system    etcd-k8s-master                      1/1     Running            0               19m
+kube-system    kube-apiserver-k8s-master            1/1     Running            0               19m
+kube-system    kube-controller-manager-k8s-master   1/1     Running            0               19m
+kube-system    kube-proxy-86gj4                     0/1     CrashLoopBackOff   6 (37s ago)     18m
+kube-system    kube-proxy-bhv7f                     0/1     CrashLoopBackOff   7 (115s ago)    18m
+kube-system    kube-proxy-d8np8                     1/1     Running            0               18m
+kube-system    kube-scheduler-k8s-master            1/1     Running            0               19m
+```
+
 ### Files
 
 ```txt
