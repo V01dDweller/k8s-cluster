@@ -946,7 +946,7 @@ TASK [docker_install : Restarting Docker now] **********************************
 
 TASK [docker_install : Restarting Docker now] **********************************************************
 
-RUNNING HANDLER [docker_install : Restart Docker] ******************************************************
+RUNNING HANDLER [docker_install : Restart docker] ******************************************************
 changed: [k8s-node-1]
 changed: [k8s-node-2]
 changed: [k8s-master]
