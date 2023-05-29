@@ -17,7 +17,7 @@ Vagrant, and an Ansible playbook is provided to do everything else.
 
 ### Issues
 
-Flannel and proxy pods keep restarting:
+* Flannel and proxy pods keep restarting:
 
 ```
 vagrant@k8s-master:~$ kubectl get pods -A
@@ -34,6 +34,28 @@ kube-system    kube-proxy-86gj4                     0/1     CrashLoopBackOff   6
 kube-system    kube-proxy-bhv7f                     0/1     CrashLoopBackOff   7 (115s ago)    18m
 kube-system    kube-proxy-d8np8                     1/1     Running            0               18m
 kube-system    kube-scheduler-k8s-master            1/1     Running            0               19m
+```
+* Docker service fails to start
+
+```
+vagrant@k8s-master:/var/log$ sudo systemctl status docker
+× docker.service - Docker Application Container Engine
+     Loaded: loaded (/lib/systemd/system/docker.service; enabled; vendor preset: enabled)
+     Active: failed (Result: exit-code) since Mon 2023-05-29 14:40:50 EDT; 16min ago
+TriggeredBy: × docker.socket
+       Docs: https://docs.docker.com
+    Process: 8273 ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock (code=exited, status=1/FAILURE)
+   Main PID: 8273 (code=exited, status=1/FAILURE)
+        CPU: 87ms
+
+May 29 14:40:48 k8s-master systemd[1]: docker.service: Main process exited, code=exited, status=1/FAILURE
+May 29 14:40:48 k8s-master systemd[1]: docker.service: Failed with result 'exit-code'.
+May 29 14:40:48 k8s-master systemd[1]: Failed to start Docker Application Container Engine.
+May 29 14:40:50 k8s-master systemd[1]: docker.service: Scheduled restart job, restart counter is at 3.
+May 29 14:40:50 k8s-master systemd[1]: Stopped Docker Application Container Engine.
+May 29 14:40:50 k8s-master systemd[1]: docker.service: Start request repeated too quickly.
+May 29 14:40:50 k8s-master systemd[1]: docker.service: Failed with result 'exit-code'.
+May 29 14:40:50 k8s-master systemd[1]: Failed to start Docker Application Container Engine.
 ```
 
 ### Files
@@ -93,20 +115,6 @@ kube-system    kube-scheduler-k8s-master            1/1     Running            0
 
 * [How to Install Kubernetes Cluster on Ubuntu 22.04](https://www.linuxtechi.com/install-kubernetes-on-ubuntu-22-04/)
 * [How to Install Kubernetes on Ubuntu 20.04](https://phoenixnap.com/kb/install-kubernetes-on-ubuntu)
-
-## Issues
-
-* Errors in `/var/log/syslog` on nodes, e.g.:
-
-```txt
-May  1 03:37:04 ubuntu-jammy containerd[6520]: time="2023-05-01T03:37:04.627545511Z" level=error msg="RunPodSandbox for &PodSandboxMetadata{Name:coredns-5d78c9869d-9hrhc,Uid:186e6377-e6d6-4112-a902-3fc342485702,Namespace:kube-system,Attempt:0,} failed, error" error="failed to setup network for sandbox \"ae34e6c81d513e312572f290c09f4e11080da570b802e8907eaca8fcb4d1742d\": plugin type=\"flannel\" failed (add): loadFlannelSubnetEnv failed: open /run/flannel/subnet.env: no such file or directory"
-May  1 03:37:04 ubuntu-jammy kubelet[7199]: E0501 03:37:04.630283    7199 remote_runtime.go:176] "RunPodSandbox from runtime service failed" err="rpc error: code = Unknown desc = failed to setup network for sandbox \"ae34e6c81d513e312572f290c09f4e11080da570b802e8907eaca8fcb4d1742d\": plugin type=\"flannel\" failed (add): loadFlannelSubnetEnv failed: open /run/flannel/subnet.env: no such file or directory"
-May  1 03:37:04 ubuntu-jammy kubelet[7199]: E0501 03:37:04.630953    7199 kuberuntime_sandbox.go:72] "Failed to create sandbox for pod" err="rpc error: code = Unknown desc = failed to setup network for sandbox \"ae34e6c81d513e312572f290c09f4e11080da570b802e8907eaca8fcb4d1742d\": plugin type=\"flannel\" failed (add): loadFlannelSubnetEnv failed: open /run/flannel/subnet.env: no such file or directory" pod="kube-system/coredns-5d78c9869d-9hrhc"
-May  1 03:37:04 ubuntu-jammy kubelet[7199]: E0501 03:37:04.630982    7199 kuberuntime_manager.go:1122] "CreatePodSandbox for pod failed" err="rpc error: code = Unknown desc = failed to setup network for sandbox \"ae34e6c81d513e312572f290c09f4e11080da570b802e8907eaca8fcb4d1742d\": plugin type=\"flannel\" failed (add): loadFlannelSubnetEnv failed: open /run/flannel/subnet.env: no such file or directory" pod="kube-system/coredns-5d78c9869d-9hrhc"
-May  1 03:37:04 ubuntu-jammy kubelet[7199]: E0501 03:37:04.631030    7199 pod_workers.go:1281] "Error syncing pod, skipping" err="failed to \"CreatePodSandbox\" for \"coredns-5d78c9869d-9hrhc_kube-system(186e6377-e6d6-4112-a902-3fc342485702)\" with CreatePodSandboxError: \"Failed to create sandbox for pod \\\"coredns-5d78c9869d-9hrhc_kube-system(186e6377-e6d6-4112-a902-3fc342485702)\\\": rpc error: code = Unknown desc = failed to setup network for sandbox \\\"ae34e6c81d513e312572f290c09f4e11080da570b802e8907eaca8fcb4d1742d\\\": plugin type=\\\"flannel\\\" failed (add): loadFlannelSubnetEnv failed: open /run/flannel/subnet.env: no such file or directory\"" pod="kube-system/coredns-5d78c9869d-9hrhc" podUID=186e6377-e6d6-4112-a902-3fc342485702
-May  1 03:37:10 ubuntu-jammy kubelet[7199]: I0501 03:37:10.565632    7199 scope.go:115] "RemoveContainer" containerID="b6862d76d8105764a845260936870c9af63f85239f6623f383999fb30e3bab29"
-May  1 03:37:10 ubuntu-jammy kubelet[7199]: E0501 03:37:10.565928    7199 pod_workers.go:1281] "Error syncing pod, skipping" err="failed to \"StartContainer\" for \"kube-flannel\" with CrashLoopBackOff: \"back-off 5m0s restarting failed container=kube-flannel pod=kube-flannel-ds-q62vn_kube-flannel(f8f2572f-a8ce-4c10-a0fa-b08d04e24c91)\"" pod="kube-flannel/kube-flannel-ds-q62vn" podUID=f8f2572f-a8ce-4c10-a0fa-b08d04e24c91
-```
 
 ## Requirements
 
