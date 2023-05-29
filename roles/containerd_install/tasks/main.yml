@@ -1,0 +1,112 @@
+# file: roles/containerd_install/tasks/main.yml
+---
+- name: Gathering facts
+  ansible.builtin.setup:
+    gather_subset: min
+
+- name: Installing dependencies
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - software-properties-common
+    state: present
+
+- name: Installing containerd
+  ansible.builtin.apt:
+    name: containerd
+    state: present
+
+- name: Creating /etc/modules-load.d/containerd.conf
+  ansible.builtin.copy:
+    content: |
+      overlay
+      br_netfilter
+    dest: /etc/modules-load.d/containerd.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Issue modprobe overlay
+
+- name: Creating  /etc/containerd
+  ansible.builtin.file:
+    path: /etc/containerd
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Updating /etc/containerd/config.toml
+  # This task solves the issue with kubeadm init command failing as follows:
+  # (Reference: https://github.com/containerd/containerd/issues/8139)
+  #
+  #     sudo kubeadm init --control-plane-endpoint=k8s-master
+  #     [init] Using Kubernetes version: v1.27.1
+  #     [preflight] Running pre-flight checks
+  #     error execution phase preflight: [preflight] Some fatal errors occurred:
+  #             [ERROR CRI]: container runtime is not running: output:
+  #             time="2023-04-30T19:53:03Z" level=fatal msg="validate
+  #             service connection: CRI v1 runtime API is not implemented
+  #             for endpoint
+  #             \"unix:///var/run/containerd/containerd.sock\": rpc error:
+  #             code = Unimplemented desc = unknown service
+  #             runtime.v1.RuntimeService" , error: exit status 1
+  #             [preflight] If you know what you are doing, you can make a
+  #             check non-fatal with `--ignore-preflight-errors=...` To
+  #             see the stack trace of this error execute with --v=5 or
+  #             higher
+  ansible.builtin.copy:
+    content: |
+      #   Copyright 2018-2022 Docker Inc.
+
+      #   Licensed under the Apache License, Version 2.0 (the "License");
+      #   you may not use this file except in compliance with the License.
+      #   You may obtain a copy of the License at
+
+      #       http://www.apache.org/licenses/LICENSE-2.0
+
+      #   Unless required by applicable law or agreed to in writing, software
+      #   distributed under the License is distributed on an "AS IS" BASIS,
+      #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      #   See the License for the specific language governing permissions and
+      #   limitations under the License.
+
+      enabled_plugins = ["cri"]
+      [plugins."io.containerd.grpc.v1.cri".containerd]
+        endpoint = "unix:///var/run/containerd/containerd.sock"
+
+
+      #root = "/var/lib/containerd"
+      #state = "/run/containerd"
+      #subreaper = true
+      #oom_score = 0
+
+      #[grpc]
+      #  address = "/run/containerd/containerd.sock"
+      #  uid = 0
+      #  gid = 0
+
+      #[debug]
+      #  address = "/run/containerd/debug.sock"
+      #  uid = 0
+      #  gid = 0
+      #  level = "info"
+    dest: /etc/containerd/config.toml
+    owner: root
+    group: root
+    mode: '0644'
+    backup: true
+  notify: Restart containerd
+
+- name: Enabling and restarting containerd
+  ansible.builtin.systemd:
+    name: containerd
+    state: started
+    enabled: true
+    daemon_reload: true
+
+- name: Flushing handlers now to restart containerd
+  ansible.builtin.meta: flush_handlers
+...

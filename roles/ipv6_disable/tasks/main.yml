@@ -1,0 +1,11 @@
+# file: roles/ipv6_disable/tasks/main.yml
+---
+- name: Gathering facts
+  ansible.builtin.setup:
+    gather_subset: min
+
+- name: Disabling IPv6 in Ubuntu 22.04
+  ansible.builtin.include_tasks: ubuntu22.yml
+  when: ansible_distribution == "Ubuntu" and
+        ansible_distribution_major_version == "22"
+...

@@ -1,0 +1,14 @@
+# file: roles/ipv6_disable/handlers/main.yml
+---
+- name: Update grub.cfg
+  ansible.builtin.shell: |
+    set -o pipefail
+    update-grub
+  args:
+    executable: /bin/bash
+  listen: Update grub and reboot
+
+- name: IPv6 Reboot
+  ansible.builtin.reboot:
+  listen: Update grub and reboot
+...

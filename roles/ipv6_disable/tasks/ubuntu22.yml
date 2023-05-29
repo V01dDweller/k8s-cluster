@@ -1,0 +1,25 @@
+# file: roles/ipv6_disable/tasks/ubuntu22.yml
+---
+- name: Updating /etc/default/grub
+  ansible.builtin.copy:
+    src: grub
+    dest: /etc/default/grub
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Update grub and reboot
+
+- name: Removing ip6 lines from /etc/hosts
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: '{{ item }}'
+    state: absent
+    backup: true
+  loop:
+    - ip6
+    - IPv6
+
+- name: Flushing handlers for immediate reboot
+  ansible.builtin.meta: flush_handlers
+...
+# vim: filetype=ansible syntax=yaml.ansible

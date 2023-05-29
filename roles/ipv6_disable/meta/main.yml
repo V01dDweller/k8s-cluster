@@ -1,0 +1,13 @@
+# file: roles/ipv6_disable/meta/main.yml
+---
+galaxy_info:
+  author: V01dDweller
+  description: Disable IPv6
+  company: The Galaxy Project
+  license: AFL v3.0
+  min_ansible_version: '2.10'
+  platforms:
+    - name: Ubuntu
+      release:
+        - '22'
+...

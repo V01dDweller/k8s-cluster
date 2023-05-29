@@ -1,0 +1,20 @@
+# file: roles/hosts_update/tasks/main.yml
+---
+- name: Checking hostname
+  ansible.builtin.command: hostname
+  register: my_hostname
+  changed_when: false
+
+- name: Displaying my_hosname
+  ansible.builtin.debug:
+    var: my_hostname.stdout
+
+- name: Update /etc/hosts
+  ansible.builtin.template:
+    src: hosts.j2
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: '0644'
+    backup: true
+...
