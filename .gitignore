@@ -10,3 +10,6 @@ desktop.ini
 
 # Vagrant hidden directory
 .vagrant
+
+# VSCode hidden directory
+.vscode
