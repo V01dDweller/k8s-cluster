@@ -6,4 +6,7 @@
     state: restarted
     enabled: true
     daemon_reload: true
+
+- name: Docker reboot
+  ansible.builtin.reboot:
 ...
