@@ -1,0 +1,81 @@
+# file: roles/docker_install/tasks/ubuntu22.yml
+
+# Based on this article:
+# https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-22-04
+
+---
+- name: Installing dependencies
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - software-properties-common
+    state: present
+
+- name: Adding Docker apt repo signing key
+  ansible.builtin.apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    keyring: /usr/share/keyrings/docker-archive-keyring.gpg
+    state: present
+
+- name: Adding Docker apt repo
+  ansible.builtin.shell: |
+    set -o pipefail
+    echo "deb [arch=$(dpkg --print-architecture) \
+    signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
+    https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | \
+    tee /etc/apt/sources.list.d/docker.list > /dev/null
+  args:
+    executable: /bin/bash
+    creates: /etc/apt/sources.list.d/docker.list
+  become: true
+
+- name: Updating apt cache
+  ansible.builtin.apt:
+    update_cache: true
+  changed_when: false
+
+- name: Issuing apt-cache policy
+  ansible.builtin.command: apt-cache policy docker-ce
+  changed_when: false
+  register: apt_policy
+
+- name: Displaying policy update output
+  ansible.builtin.debug:
+    var: apt_policy.stdout
+
+- name: Installing Docker CE
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+    state: present
+
+- name: Adding {{ target_user }} to the docker group
+  ansible.builtin.user:
+    name: '{{ target_user }}'
+    groups: docker
+    append: true
+  notify: Docker reboot
+
+- name: Creating /etc/docker/daemon.json
+  ansible.builtin.copy:
+    content: |
+      {
+        "exec-opts": ["native.cgroupdriver=systemd"],
+        "log-driver": "json-file",
+        "log-opts": {
+          "max-size": "100m"
+        },
+        "storage-driver": "overlay2"
+      }
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart docker
+
+- name: Restarting Docker now
+  ansible.builtin.meta: flush_handlers
+...
