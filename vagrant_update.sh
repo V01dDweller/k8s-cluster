@@ -1,6 +1,6 @@
 #!/bin/env bash
 set -Eeuxo pipefail
-read -p "Enter your Windows username: " WINDOWS_USERNAME
+WINDOWS_USERNAME=$(echo "$APPDATA" | cut --delimiter='\' -f 3)
 if [ -d .vagrant ]; then
     echo "Removing .vagrant directory..."
     rm -rf .vagrant
