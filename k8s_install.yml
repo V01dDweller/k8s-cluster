@@ -129,6 +129,9 @@
         mode: '0644'
       notify: Restart kubelet
 
+    - name: Flushing handlers now to create /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+      ansible.builtin.meta: flush_handlers
+
     - name: Updating /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
       ansible.builtin.copy:
         content: |
