@@ -55,8 +55,8 @@
 
     - name: Adding Kubernetes signing key
       ansible.builtin.apt_key:
-        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-        keyring: /usr/share/keyrings/kubernetes.gpg
+        url: https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key
+        keyring: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
         state: present
       tags: packages
 
