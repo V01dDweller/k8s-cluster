@@ -17,9 +17,29 @@ Based on [Kubernetes Official Documentation](https://kubernetes.io/docs/setup/pr
 
 ### Issues
 
-- 2024-06-01: The cluster seems to be working but there are some
-  `CrashLoopBackoff` errors for cilium and kube-proxy pods that need
-  investigation.
+- 2024-06-01: There are some `CrashLoopBackoff` errors for cilium and
+  kube-proxy pods that need investigation. The issue may be network related.
+
+<details>
+<summary>Sample output: kubectl get pods -n kube-system</summary>
+
+```txt
+NAMESPACE     NAME                                 READY   STATUS             RESTARTS         AGE
+kube-system   cilium-n58ss                         0/1     CrashLoopBackOff   40 (4m50s ago)   3h37m
+kube-system   cilium-operator-6df6cdb59b-slvfm     1/1     Running            0                3h37m
+kube-system   cilium-w6qz8                         1/1     Running            0                3h37m
+kube-system   cilium-wpkc2                         0/1     CrashLoopBackOff   44 (4m23s ago)   3h37m
+kube-system   coredns-7db6d8ff4d-2cnk8             1/1     Running            0                3h37m
+kube-system   coredns-7db6d8ff4d-nhwn2             1/1     Running            0                3h37m
+kube-system   etcd-k8s-master                      1/1     Running            0                3h38m
+kube-system   kube-apiserver-k8s-master            1/1     Running            0                3h38m
+kube-system   kube-controller-manager-k8s-master   1/1     Running            0                3h38m
+kube-system   kube-proxy-4m7vh                     1/1     Running            0                3h37m
+kube-system   kube-proxy-dnjc4                     0/1     CrashLoopBackOff   38 (4m53s ago)   3h37m
+kube-system   kube-proxy-r4tqh                     0/1     CrashLoopBackOff   39 (4m59s ago)   3h37m
+kube-system   kube-scheduler-k8s-master            1/1     Running            0                3h38m
+```
+</details>
 
 - An ingress controller is still needed
 
