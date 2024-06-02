@@ -126,7 +126,7 @@ Windows and must be run in a WSL2 instance.
 1. In a PowerShell, clone this project to the Desktop or the directory of your
 choice.
 
-1. Open a PowerShell and CD to the project directory, e.g.:
+1. CD to the project directory, e.g.:
 
 ```txt
 Windows PowerShell
