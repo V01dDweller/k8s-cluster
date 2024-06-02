@@ -157,6 +157,7 @@
         group: root
         mode: '0644'
       notify: Restart kubelet
+      tags: never
 
     - name: Saving the master hostname from the inventory
       ansible.builtin.set_fact:
