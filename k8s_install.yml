@@ -57,14 +57,14 @@
 
     - name: Adding Kubernetes signing key
       ansible.builtin.apt_key:
-        url: https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key
+        url: https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key
         keyring: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
         state: present
       tags: packages
 
     - name: Adding Kubernetes repository
       ansible.builtin.apt_repository:
-        repo: deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /
+        repo: deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /
         state: present
         filename: kubernetes.list
       tags: packages
