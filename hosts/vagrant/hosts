@@ -14,4 +14,4 @@ nodes
 [all:vars]
 ansible_user=vagrant
 
-# vim: set nospell
+# vim: set number nospell
