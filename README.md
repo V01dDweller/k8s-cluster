@@ -112,9 +112,22 @@ kube-system   kube-scheduler-k8s-master            1/1     Running            0 
 #### MacOS/Linux
 
 1. Open a terminal and clone the project
-1. CD into the project directory
-1. Issue a `vagrant up` to create the virtual machines
-1. Run the playbook, e.g. `ansible-playbook k8s_install.yml`
+2. CD into the project directory
+3. Issue a `vagrant up --provider=<provider-name>` to create the virtual machines
+
+##### MacOS
+
+```sh
+$ vagrant up --provider=parallels
+```
+
+##### Linux
+
+```sh
+$ vagrant up --provider=virtualbox
+```
+
+4. Run the playbook, e.g. `ansible-playbook -i hosts/parallels k8s_install.yml`
 
 #### Windows
 
@@ -136,7 +149,7 @@ PS C:\Users\V01dDweller> cd .\Desktop\k8s-cluster\
 PS C:\Users\V01dDweller\Desktop\k8s-cluster>
 ```
 
-1. Issue the `vagrant up` command to create three virtual machines.
+1. Issue the `vagrant up --provider=virtualbox` command to create three virtual machines.
 
 1. Switch to a WSL2 instance and clone the project again.
 
