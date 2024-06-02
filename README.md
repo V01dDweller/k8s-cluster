@@ -44,6 +44,7 @@ kube-system   kube-scheduler-k8s-master            1/1     Running            0 
 </details>
 
 - An ingress controller is still needed
+- Currently untested on MacOS with Parallels and Linux with VirtuLaBox
 
 ### Files
 
