@@ -1244,4 +1244,4 @@ localhost                  : ok=3    changed=0    unreachable=0    failed=0    s
 
 </details>
 
-[modeline]: # ( vi: set number textwidth=78 colorcolumn=80 nowrap: )
+[modeline]: # ( vim: set number textwidth=78 colorcolumn=80 foldcolumn=2  nowrap: )
