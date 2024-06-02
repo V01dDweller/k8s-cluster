@@ -21,6 +21,8 @@ Based on [Kubernetes Official Documentation](https://kubernetes.io/docs/setup/pr
   `CrashLoopBackoff` errors for cilium and kube-proxy pods that need
   investigation.
 
+- An ingress controller is still needed
+
 ### Files
 
 ```txt
