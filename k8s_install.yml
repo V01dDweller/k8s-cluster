@@ -167,7 +167,7 @@
       ansible.builtin.debug:
         msg: The master is {{ master_hostname }}
 
-    - name: Initializing the cluster via kubeadmin
+    - name: Initializing the cluster via kubeadmin (this may take some time)
       ansible.builtin.shell: |
         set -o pipefail
         kubeadm init \
