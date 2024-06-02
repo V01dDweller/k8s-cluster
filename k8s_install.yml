@@ -105,6 +105,9 @@
         group: root
         mode: '0644'
       notify: Reload sysctl
+      tags:
+        - packages
+        - forwarding
 
   handlers:
     - name: Issue modprobe overlay
