@@ -102,7 +102,8 @@ kube-system   kube-scheduler-k8s-master            1/1     Running            0 
 
 ## Requirements
 
-- VirtualBox
+- VirtualBox (Windows, Linux)
+- Parallels (MacOS)
 - Vagrant
 - Ansible (Windows users, use a WSL2 instance with Ansible installed)
 
