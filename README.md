@@ -15,7 +15,12 @@ Using the project and the automation it contains, a user should be able to:
 A Vagrantfile is provided to automate creating the virtual machines with
 Vagrant, and an Ansible playbook is provided to do everything else.
 
+Based on [Kubernetes Official Documentation](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/)
+
 ### Issues
+
+* 2024-05-19: The cluster no longer works due to breaking changes in
+  Kubernetes 1.30.1. The cluster was created using Kubernetes 1.22.0.
 
 * Flannel and proxy pods keep restarting:
 
