@@ -111,3 +111,4 @@
 - name: Flushing handlers now to restart containerd
   ansible.builtin.meta: flush_handlers
 ...
+# vim: ft=ansible:syntax=yaml.ansible:number:nowrap nospell
