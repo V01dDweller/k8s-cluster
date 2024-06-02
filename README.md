@@ -17,7 +17,7 @@ Based on [Kubernetes Official Documentation](https://kubernetes.io/docs/setup/pr
 
 ### Issues
 
-- 2024-06-01: There are some `CrashLoopBackoff` errors for cilium and
+- 2024-06-01: There are some `CrashLoopBackOff` errors for cilium and
   kube-proxy pods that need investigation. The issue may be network related.
 
 <details>
