@@ -1,0 +1,7 @@
+# file: hosts/vagrant/group_vars/all.yml
+---
+ansible_ssh_private_key_file: ./.vagrant/machines/{{ inventory_hostname }}/parallels/private_key
+target_user: vagrant
+target_group: vagrant
+kubectl_version.content: v1.30.1
+...
