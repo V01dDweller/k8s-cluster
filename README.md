@@ -21,9 +21,11 @@ Based on [Kubernetes Official Documentation](https://kubernetes.io/docs/setup/pr
   kube-proxy pods that need investigation. The issue may be network related.
 
 <details>
-<summary>Sample output: kubectl get pods -n kube-system</summary>
+<summary>Sample output:</summary>
 
 ```txt
+bash-5.1$ kubectl get pods -A
+
 NAMESPACE     NAME                                 READY   STATUS             RESTARTS         AGE
 kube-system   cilium-n58ss                         0/1     CrashLoopBackOff   40 (4m50s ago)   3h37m
 kube-system   cilium-operator-6df6cdb59b-slvfm     1/1     Running            0                3h37m
