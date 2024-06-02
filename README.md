@@ -1,7 +1,7 @@
 # k8s-cluster
 
-Use this project to create a 3-node Kubernetes cluster using Vagrant,
-VirtualBox and Ansible. Follow the instructions below to:
+This project was created to learn more about Kubernetes. Follow the
+instructions below to:
 
 1. Create 3x Ubuntu 22.04 (Jammy) virtual machines
 1. Install `kubeadmin` on the host
