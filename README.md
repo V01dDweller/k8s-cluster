@@ -7,8 +7,8 @@ instructions below to:
 1. Install `kubeadmin` on the host
 1. Install `containerd` on each node
 1. Configure one virtual machine as the master
-1. Configure the remaining two virtual machines as worker nodes
 1. Install a CNI plugin (Cilium)
+1. Configure the remaining two virtual machines as worker nodes
 
 A Vagrantfile is provided to automate creating the virtual machines with
 Vagrant, and an Ansible playbook is provided to do everything else.
