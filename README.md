@@ -1,4 +1,3 @@
-
 # k8s-cluster
 
 Use this project to create a 3-node Kubernetes cluster using local VirtualBox
