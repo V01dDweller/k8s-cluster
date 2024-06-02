@@ -18,49 +18,9 @@ Based on [Kubernetes Official Documentation](https://kubernetes.io/docs/setup/pr
 
 ### Issues
 
-* 2024-05-19: The cluster no longer works due to breaking changes in
-  Kubernetes 1.30.1. The cluster was created using Kubernetes 1.22.0.
-
-* Flannel and proxy pods keep restarting:
-
-```
-vagrant@k8s-master:~$ kubectl get pods -A
-NAMESPACE      NAME                                 READY   STATUS             RESTARTS        AGE
-kube-flannel   kube-flannel-ds-4qvh6                1/1     Running            0               18m
-kube-flannel   kube-flannel-ds-6v6hc                0/1     CrashLoopBackOff   6 (116s ago)    18m
-kube-flannel   kube-flannel-ds-p6dgm                1/1     Running            6 (5m56s ago)   18m
-kube-system    coredns-5d78c9869d-g6cgv             1/1     Running            0               18m
-kube-system    coredns-5d78c9869d-kxmcp             1/1     Running            0               18m
-kube-system    etcd-k8s-master                      1/1     Running            0               19m
-kube-system    kube-apiserver-k8s-master            1/1     Running            0               19m
-kube-system    kube-controller-manager-k8s-master   1/1     Running            0               19m
-kube-system    kube-proxy-86gj4                     0/1     CrashLoopBackOff   6 (37s ago)     18m
-kube-system    kube-proxy-bhv7f                     0/1     CrashLoopBackOff   7 (115s ago)    18m
-kube-system    kube-proxy-d8np8                     1/1     Running            0               18m
-kube-system    kube-scheduler-k8s-master            1/1     Running            0               19m
-```
-* Docker service fails to start
-
-```
-vagrant@k8s-master:/var/log$ sudo systemctl status docker
-× docker.service - Docker Application Container Engine
-     Loaded: loaded (/lib/systemd/system/docker.service; enabled; vendor preset: enabled)
-     Active: failed (Result: exit-code) since Mon 2023-05-29 14:40:50 EDT; 16min ago
-TriggeredBy: × docker.socket
-       Docs: https://docs.docker.com
-    Process: 8273 ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock (code=exited, status=1/FAILURE)
-   Main PID: 8273 (code=exited, status=1/FAILURE)
-        CPU: 87ms
-
-May 29 14:40:48 k8s-master systemd[1]: docker.service: Main process exited, code=exited, status=1/FAILURE
-May 29 14:40:48 k8s-master systemd[1]: docker.service: Failed with result 'exit-code'.
-May 29 14:40:48 k8s-master systemd[1]: Failed to start Docker Application Container Engine.
-May 29 14:40:50 k8s-master systemd[1]: docker.service: Scheduled restart job, restart counter is at 3.
-May 29 14:40:50 k8s-master systemd[1]: Stopped Docker Application Container Engine.
-May 29 14:40:50 k8s-master systemd[1]: docker.service: Start request repeated too quickly.
-May 29 14:40:50 k8s-master systemd[1]: docker.service: Failed with result 'exit-code'.
-May 29 14:40:50 k8s-master systemd[1]: Failed to start Docker Application Container Engine.
-```
+- 2024-06-01: The cluster seems to be working but there are some
+  `CrashLoopBackoff` errors for cilium and kube-proxy pods that need
+  investigation.
 
 ### Files
 
