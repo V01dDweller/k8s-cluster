@@ -17,6 +17,9 @@ Based on [Kubernetes Official Documentation](https://kubernetes.io/docs/setup/pr
 
 ### Issues
 
+- The `ubuntu/jammy64` box is not available for Parallels on Arm64 Macs.
+  Switch to `bento/ubuntu-22.04` and test.
+
 - 2024-06-01: There are some `CrashLoopBackOff` errors for cilium and
   kube-proxy pods that need investigation. The issue may be network related.
 
