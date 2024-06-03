@@ -22,6 +22,12 @@ Based on [Kubernetes Official Documentation](https://kubernetes.io/docs/setup/pr
 
 - 2024-06-01: There are some `CrashLoopBackOff` errors for cilium and
   kube-proxy pods that need investigation. The issue may be network related.
+  This might have something to do with the networking in the virtual machines
+  as they are mutli-homed, and the enp0s3 interface has the same IP address
+  and MAC address on each virtual machine, likely because they were cloned
+  from the same base box. The `Vagrantfile` adds a second network interface
+  that does not have this issue, and that is the interface used by the
+  playbook, and the one configure for cluster traffic.
 
 <details>
 <summary>Sample output:</summary>
