@@ -44,10 +44,10 @@
 
     # Docker support in Kubernetes is deprecated as of v1.20
 
-        #- role: docker_install
-        #  tags:
-        #    - docker
-        #    - packages
+    # - role: docker_install
+    #   tags:
+    #     - docker
+    #     - packages
 
   post_tasks:
     - name: Setting time zone Americas/New_York
