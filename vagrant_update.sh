@@ -9,5 +9,5 @@ WINDOWS_PATH="/mnt/c/Users/$WINDOWS_USERNAME/projects/k8s-project/.vagrant"
 echo "Copying .vagrant directory from Windows to Linux..."
 cp -rv "$WINDOWS_PATH" ./
 find .vagrant/ -type d -perm 777 -exec chmod 755 {} \;
-find .vagrant/ -type f -print0 | xargs chmod 644
-find .vagrant/ -type f -name private_key -print0 | xargs chmod 600
+find .vagrant/ -type f -print | xargs chmod 644
+find .vagrant/ -type f -name private_key -print | xargs chmod 600
