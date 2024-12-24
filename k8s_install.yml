@@ -247,7 +247,7 @@
 
     - name: Installing Cilium
       ansible.builtin.shell: |
-        cilium install --version 1.15.5
+        cilium install --version 1.16.5
       args:
         executable: /bin/bash
         creates: /opt/cni/bin/cilium-cni
