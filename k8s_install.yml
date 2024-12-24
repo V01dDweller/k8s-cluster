@@ -55,6 +55,30 @@
         name: America/New_York
       tags: timezone
 
+    # Disable swap for Kubernetes
+    # Thanks to Reddit post: https://www.reddit.com/r/linuxadmin/comments/flzx5r/ansible_how_to_disable_swap/
+    - name: Gathering facts
+      ansible.builtin.setup:
+        filter: ansible_swaptotal_mb
+      tags: swap
+
+    - name: Disabling swap
+      when: ansible_swaptotal_mb > 0
+      tags: swap
+      block:
+        - name: Disable swap for current session
+          ansible.builtin.command: swapoff -a
+          become: true
+          tags: swap
+
+        - name: Disable swap permanently, persist reboots
+          ansible.builtin.replace:
+            path: /etc/fstab
+            regexp: '^(\s*)([^#\n]+\s+)(\w+\s+)swap(\s+.*)$'
+            replace: '#\1\2\3swap\4'
+            backup: true
+          tags: swap
+
     - name: Adding Kubernetes signing key
       ansible.builtin.apt_key:
         url: https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key
