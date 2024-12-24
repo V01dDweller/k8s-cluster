@@ -5,7 +5,7 @@ if [ -d .vagrant ]; then
     echo "Removing .vagrant directory..."
     rm -rf .vagrant
 fi
-WINDOWS_PATH="/mnt/c/Users/$WINDOWS_USERNAME/projects/k8s-project/.vagrant"
+WINDOWS_PATH="/mnt/c/Users/$WINDOWS_USERNAME/projects/k8s-cluster/.vagrant"
 echo "Copying .vagrant directory from Windows to Linux..."
 cp -rv "$WINDOWS_PATH" ./
 find .vagrant/ -type d -perm 777 -exec chmod 755 {} \;
