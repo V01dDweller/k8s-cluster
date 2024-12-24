@@ -1,4 +1,5 @@
-BOX_IMAGE="ubuntu/jammy64"
+#BOX_IMAGE="ubuntu/jammy64"
+BOX_IMAGE="bento/ubuntu-24.04"
 NODE_COUNT=2
 
 Vagrant.configure("2") do |config|
