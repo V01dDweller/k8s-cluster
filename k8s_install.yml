@@ -143,7 +143,7 @@
       changed_when: false
 
 - name: Configure the master
-  hosts: k8s-master
+  hosts: master
   become: true
   gather_facts: false
   tags: master
