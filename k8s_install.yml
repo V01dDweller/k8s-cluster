@@ -224,35 +224,75 @@
         group: '{{ ansible_user }}'
         mode: '0644'
 
-    # Base on Cilium Quick Installation guide found
-    # here: https://docs.cilium.io/en/stable/gettingstarted/k8s-install-default/
-    - name: Installing the Cilium CLI
+    - name: Enabling bridging and iptables for flannel
       ansible.builtin.shell: |
-        CILIUM_CLI_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/cilium-cli/main/stable.txt)
-        CLI_ARCH=amd64
-        if [ "$(uname -m)" = "aarch64" ]; then CLI_ARCH=arm64; fi
-        curl -L --fail --remote-name-all https://github.com/cilium/cilium-cli/releases/download/${CILIUM_CLI_VERSION}/cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
-        sha256sum --check cilium-linux-${CLI_ARCH}.tar.gz.sha256sum
-        sudo tar xzvfC cilium-linux-${CLI_ARCH}.tar.gz /usr/local/bin
-        rm cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
+        set -o pipefail
+        modprobe bridge
+        echo "net.bridge.bridge-nf-call-iptables = 1" >> /etc/sysctl.conf
+        modprobe br_netfilter
+        sysctl -p /etc/sysctl.conf
       args:
         executable: /bin/bash
-        creates: /usr/local/bin/cilium
-      become: false
-      register: cilium_cli_install
+      tags: flannel
 
-    - name: Displaying cilium cli install output
+
+    - name: Installing Flannel
+      ansible.builtin.shell: |
+        set -o pipefail
+        export KUBECONFIG=/etc/kubernetes/admin.conf
+        kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
+      args:
+        executable: /bin/bash
+      register: flannel_install
+      tags: flannel
+
+    - name: Displaying flannel install output
       ansible.builtin.debug:
-        msg: '{{ cilium_cli_install.stdout }}'
+        msg: '{{ flannel_install.stdout }}'
 
-    - name: Installing Cilium
+    - name: Waiting for the cluster to be ready
       ansible.builtin.shell: |
-        cilium install --version 1.16.5
+        set -o pipefail
+        export KUBECONFIG=/etc/kubernetes/admin.conf
+        kubectl get nodes
       args:
         executable: /bin/bash
-        creates: /opt/cni/bin/cilium-cni
-      become: false
-      register: cilium_install
+      register: node_status
+      until:
+        - '"Ready" in node_status.stdout'
+      retries: 10
+      delay: 3
+      tags: flannel
+
+        # # Base on Cilium Quick Installation guide found
+        # # here: https://docs.cilium.io/en/stable/gettingstarted/k8s-install-default/
+        # - name: Installing the Cilium CLI
+        #   ansible.builtin.shell: |
+        #     CILIUM_CLI_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/cilium-cli/main/stable.txt)
+        #     CLI_ARCH=amd64
+        #     if [ "$(uname -m)" = "aarch64" ]; then CLI_ARCH=arm64; fi
+        #     curl -L --fail --remote-name-all https://github.com/cilium/cilium-cli/releases/download/${CILIUM_CLI_VERSION}/cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
+        #     sha256sum --check cilium-linux-${CLI_ARCH}.tar.gz.sha256sum
+        #     sudo tar xzvfC cilium-linux-${CLI_ARCH}.tar.gz /usr/local/bin
+        #     rm cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
+        #   args:
+        #     executable: /bin/bash
+        #     creates: /usr/local/bin/cilium
+        #   become: false
+        #   register: cilium_cli_install
+
+        # - name: Displaying cilium cli install output
+        #   ansible.builtin.debug:
+        #     msg: '{{ cilium_cli_install.stdout }}'
+
+        # - name: Installing Cilium
+        #   ansible.builtin.shell: |
+        #     cilium install --version 1.16.5
+        #   args:
+        #     executable: /bin/bash
+        #     creates: /opt/cni/bin/cilium-cni
+        #   become: false
+        #   register: cilium_install
 
     - name: Getting cluster status
       ansible.builtin.shell: |
