@@ -8,4 +8,9 @@
   ansible.builtin.include_tasks: ubuntu22.yml
   when: ansible_distribution == "Ubuntu" and
         ansible_distribution_major_version == "22"
+
+- name: Disabling IPv6 in Ubuntu 24.04
+  ansible.builtin.include_tasks: ubuntu24.yml
+  when: ansible_distribution == "Ubuntu" and
+        ansible_distribution_major_version == "24"
 ...
