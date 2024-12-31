@@ -1,0 +1,17 @@
+# file: hosts/adhoc/hosts
+
+[master]
+controller ansible_host=192.168.186.180
+
+[nodes]
+worker1 ansible_host=192.168.186.205
+worker2 ansible_host=192.168.186.143
+
+[k8s:children]
+master
+nodes
+
+[all:vars]
+ansible_user=vagrant
+
+# vim: set number nospell
