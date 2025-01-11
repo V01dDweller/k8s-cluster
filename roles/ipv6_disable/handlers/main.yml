@@ -11,12 +11,4 @@
 - name: IPv6 Reboot
   ansible.builtin.reboot:
   listen: Update grub and reboot
-
-- name: IPV6 Load Changes
-  ansible.builtin.shell: |
-    set -o pipefail
-    sysctl -p
-  args:
-    executable: /bin/bash
-  listen: IPV6 Load Changes
 ...
