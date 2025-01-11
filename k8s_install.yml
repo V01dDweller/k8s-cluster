@@ -234,16 +234,48 @@
         executable: /bin/bash
       tags: flannel
 
+    - name: Downloading flannel manifest
+      ansible.builtin.get_url:
+        url: https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
+        dest: /etc/kubernetes/kube-flannel.yml
+        mode: '0644'
+        owner: root
+        group: root
+      tags: flannel
+
+    # NOTE: This task is needed because the Vagrantfile adds a 2nd nic
+    # for the private network. Adding the --iface=eth1 to the flannel
+    # manifest will allow flannel to use the private network for the
+    # overlay network.
+    # Reference: https://stackoverflow.com/questions/47845739/configuring-flannel-to-use-a-non-default-interface-in-kubernetes
+    - name: Updating kube-flannel.yml with "--iface=eth1"
+      ansible.builtin.lineinfile:
+        path: /etc/kubernetes/kube-flannel.yml
+        line: '        - --iface=eth1'
+        insertafter: '        - --kube-subnet-mgr'
+        state: present
+        backup: true
+      tags: flannel
 
     - name: Installing Flannel
       ansible.builtin.shell: |
         set -o pipefail
         export KUBECONFIG=/etc/kubernetes/admin.conf
-        kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
+        kubectl apply -f /etc/kubernetes/kube-flannel.yml
       args:
         executable: /bin/bash
       register: flannel_install
       tags: flannel
+
+        #  - name: Installing Flannel
+        #    ansible.builtin.shell: |
+        #      set -o pipefail
+        #      export KUBECONFIG=/etc/kubernetes/admin.conf
+        #      kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
+        #    args:
+        #      executable: /bin/bash
+        #    register: flannel_install
+        #    tags: flannel
 
     - name: Displaying flannel install output
       ansible.builtin.debug:
