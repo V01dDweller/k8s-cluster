@@ -19,16 +19,6 @@
     - ip6
     - IPv6
 
-- name: Disable IPv6 in /etc/sysctl.conf
-  ansible.builtin.blockinfile:
-    block: |
-      net.ipv6.conf.all.disable_ipv6 = 1
-      net.ipv6.conf.default.disable_ipv6 = 1
-      net.ipv6.conf.lo.disable_ipv6 = 1
-    path: /etc/sysctl.conf
-    backup: true
-  notify: IPV6 Load Changes
-
 - name: Flushing handlers for immediate reboot
   ansible.builtin.meta: flush_handlers
 ...
