@@ -32,7 +32,7 @@ Vagrant.configure("2") do |config|
   config.vm.provider "virtualbox" do |vb|
     vb.gui = false
     vb.memory = "4096"
-    vb.cpus = 3
+    vb.cpus = 2
     vb.customize ["modifyvm", :id, "--vram", "33"]
     vb.customize ["modifyvm", :id, "--graphicscontroller", "VMSVGA"]
   end
