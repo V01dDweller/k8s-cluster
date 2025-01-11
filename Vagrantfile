@@ -3,6 +3,14 @@ BOX_IMAGE="bento/ubuntu-24.04"
 NODE_COUNT=2
 
 Vagrant.configure("2") do |config|
+  config.vm.define "control" do |subconfig|
+    subconfig.vm.box = BOX_IMAGE
+    subconfig.vbguest.auto_update = false
+    subconfig.vm.hostname = "control"
+    subconfig.vm.network "private_network", ip: "192.168.56.9"
+    # subconfig.vm.disk :dvd, name: "installer0", file: "/Program\ Files/Oracle/VirtualBox/VBoxGuestAdditions.iso"
+  end
+
   config.vm.define "k8s-master" do |subconfig|
     subconfig.vm.box = BOX_IMAGE
     subconfig.vbguest.auto_update = false
