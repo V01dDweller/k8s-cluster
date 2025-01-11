@@ -279,10 +279,12 @@
         #     creates: /usr/local/bin/cilium
         #   become: false
         #   register: cilium_cli_install
+        #   tags: cilium
 
         # - name: Displaying cilium cli install output
         #   ansible.builtin.debug:
         #     msg: '{{ cilium_cli_install.stdout }}'
+        #   tags: cilium
 
         # - name: Installing Cilium
         #   ansible.builtin.shell: |
@@ -292,6 +294,7 @@
         #     creates: /opt/cni/bin/cilium-cni
         #   become: false
         #   register: cilium_install
+        #   tags: cilium
 
     - name: Getting cluster status
       ansible.builtin.shell: |
